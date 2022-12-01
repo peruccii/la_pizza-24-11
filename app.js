@@ -28,6 +28,9 @@ const { json } = require('body-parser')
 
 const app = express()
 
+const controllerProduto = require('./controller/controllerProduto.js')
+const controllerAcompanhamento = require('./controller/controllerAcompanhamento.js')
+
 app.use((request, response, next) => {
 
     response.header('Access-Control-Allow-Origin', '*')
@@ -68,20 +71,49 @@ app.get('/v1/produtos', cors(), async function(request,response,next){
     response.json(message)
 })
 
-//Endpoint para listar as pizzas
 app.get('/v1/produtos/pizza', cors(), async (request, response, next) => {
     const dadosPizza = await controllerProduto.listarPizzas()
+    if (dadosPizza) {
 
-    response.status(dadosPizza.status)
-    response.json(dadosPizza)
+        statusCode = 200
+        message = dadosPizza
+
+    } else {
+        statusCode = 400
+        message = MESSAGE_ERROR.NOT_FOUND_DB
+    }
+    response.status(statusCode)
+    response.json(message)
 })
 
-//Endpoint para listar as bebidas
 app.get('/v1/produtos/bebida', cors(), async (request, response, next) => {
     const dadosBebida = await controllerProduto.listarBebidas()
+    if (dadosBebida) {
 
-    response.status(dadosBebida.status)
-    response.json(dadosBebida)
+        statusCode = 200
+        message = dadosBebida
+
+    } else {
+        statusCode = 400
+        message = MESSAGE_ERROR.NOT_FOUND_DB
+    }
+    response.status(statusCode)
+    response.json(message)
+})
+
+app.get('/v1/login', cors(), async (request, response, next) => {
+    const dadosLogin = await controllerLogin.listarLogin()
+    if (dadosLogin) {
+
+        statusCode = 200
+        message = dadosLogin
+
+    } else {
+        statusCode = 400
+        message = MESSAGE_ERROR.NOT_FOUND_DB
+    }
+    response.status(statusCode)
+    response.json(message)
 })
 
 app.listen(8080, function() {

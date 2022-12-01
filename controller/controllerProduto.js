@@ -14,6 +14,7 @@ const produto = require('../model/DAO/produto.js')
 
 
 const listarProdutos = async function(){
+
     let dadosProdutosJSON = {}
 
     const { selectAllProdutos } = require('../model/DAO/produto.js')
@@ -35,6 +36,29 @@ const listarProdutos = async function(){
 
 }
 
+const deletarProduto = async (id) => {
+
+    if (id == undefined || id == '') {
+        return {status: 400, message: MESSAGE_ERROR.REQUIRED_ID}
+    }
+
+    const verificar = await produto.selectProdutoById(id)
+
+    if (verificar) {
+        
+        const deleteProduto = await produto.deleteProduto(id)
+
+        if (deleteProduto) {
+            return {status: 200, message: MESSAGE_SUCCESS.DELETE_ITEM}
+        } else{
+            return {status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB}
+        }
+        
+    } else{
+        return {status: 404, message: MESSAGE_ERROR.NOT_FOUND_DB}
+    }
+}
+
 const listarPizzas = async function(){
 let pizzasJSON = {}
 
@@ -53,9 +77,73 @@ return pizzasJSON
 
 }
 
+const listarBebidas = async function(){
+    let bebidasJSON = {}
+    
+    //produto = caminho para eu selecionar os selects 
+    const dados = await produto.selectAllBebidas()
+    
+    if (dados) {
+        bebidasJSON.message = dados
+        bebidasJSON.status = 200
+    } else{
+        bebidasJSON.message = MESSAGE_ERROR.NOT_FOUND_DB
+        bebidasJSON.status = 404
+    }
+    
+    return bebidasJSON
+    
+}
+
+const novaPizza = async (pizza) => {
+
+   
+    if (pizza.nome == '' || pizza.nome == undefined || pizza.foto == '' || pizza.foto == undefined || pizza.preco == '' || pizza.preco == undefined || pizza.status_promocao == '' || pizza.status_promocao == undefined || pizza.status_favoritos == '' || pizza.status_favoritos == undefined) {
+        return { status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS }
+
+    } else {
+
+        const novaPizzaIngrediente = require('../model/DAO/pizza_ingrediente.js')
+       
+        const resultnovaPizza = await produto.insertProduto(pizza)
+
+        if (resultnovaPizza) {
+
+            let idNovaPizza = await produto.selectLastIdProduto()
+
+            if (idNovaPizza > 0) {
+
+                let pizzaIngrediente = {}
+ 
+             
+                pizzaIngrediente.idPizza = idNovaPizza
+                pizzaIngrediente.idIngrediente = pizza.ingrediente[0].idIngrediente
+               
+
+                const resultNovaPizzaIngrediente = await novaPizzaIngrediente.insertPizzaAcompanhamento(pizzaIngrediente)
+
+                if (resultNovaPizzaIngrediente) {
+                    return { status: 201, message: MESSAGE_SUCCESS.INSERT_ITEM }
+                } else {
+                    await deletarProduto(idNovaPizza)
+                    return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
+                }
+            } else {
+                await deletarProduto(idNovaPizza)
+                return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
+            }
+        } else {
+            return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
+        }
+    }
+}
+
 
 
 module.exports = {
-    listarProdutos
+    listarProdutos,
+    listarPizzas,
+    listarBebidas,
+    novaPizza
   
 }

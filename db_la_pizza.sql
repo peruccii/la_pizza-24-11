@@ -1,5 +1,5 @@
 create database db_la_pizza;
-
+drop database db_la_pizza;
 use db_la_pizza;
 
 show tables;
@@ -40,7 +40,6 @@ unique index(id)
 create table tbl_ingrediente(
 id int not null auto_increment primary key,
 acompanhamento varchar(150),
-nome varchar(80) not null,
 unique index(id)
 );
 
@@ -67,6 +66,7 @@ unique index(id)
 
 create table tbl_servico(
 id int not null auto_increment primary key,
+foto varchar(500) not null,
 nome varchar(50) not null,
 descricao varchar(155),
 unique index(id)
@@ -92,7 +92,7 @@ foreign key (id_telefone)
 
 unique index(id)
 );
-
+ 
 create table tbl_celular(
 id int not null auto_increment primary key,
 ddd int,
