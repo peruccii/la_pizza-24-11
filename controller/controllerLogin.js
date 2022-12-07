@@ -1,5 +1,6 @@
 const {MESSAGE_ERROR, MESSAGE_SUCCESS} = require('../modulo/config.js')
 const nlogin = require('../model/DAO/login.js');
+const log = require('../model/DAO/login')
 const novoLogin = async (login) => {
     const nlogin = require('../model/DAO/login.js');
 
@@ -82,9 +83,28 @@ const buscarLogin = async function (id) {
     }
 }
 
+const listarLogin = async function(){
+    let loginJSON = {}
+    
+    //produto = caminho para eu selecionar os selects 
+    const dados = await log.selectUser()
+    
+    if (dados) {
+        loginJSON.login = dados
+        loginJSON.status = 200
+    } else{
+        loginJSON.message = MESSAGE_ERROR.NOT_FOUND_DB
+        loginJSON.status = 404
+    }
+    
+    return loginJSON
+    
+    }
+
 module.exports = {
 excluirLogin,
 buscarLogin,
 updateLogin,
-novoLogin
+novoLogin,
+listarLogin
 }

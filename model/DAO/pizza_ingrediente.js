@@ -56,7 +56,7 @@ const selectPizzaAcompanhamento = async (idPizza) => {
         select cast(tbl_ingrediente.id as float) as id_ingrediente, tbl_ingrediente.acompanhamento as ingrediente_acompanhamento
             from tbl_pizza
                 inner join tbl_pizza_ingrediente
-                    on tbl_pizza.id = tbl_aluno_curso.id_pizza
+                    on tbl_pizza.id = tbl_pizza_ingrediente.id_pizza
                 inner join tbl_ingrediente
                     on tbl_ingrediente.id = tbl_pizza_ingrediente.id_ingrediente
         where tbl_pizza.id = ${idPizza};

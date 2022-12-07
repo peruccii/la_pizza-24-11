@@ -1,10 +1,15 @@
+const { PrismaClient } = require('@prisma/client')
+
+    const prisma = new PrismaClient()
+
+
 const selectAllProdutos = async function() {
     
     const { PrismaClient } = require('@prisma/client')
 
     const prisma = new PrismaClient()
 
-    let sql = `select cast(id as float) as id, nome, preco, status_promocao, status_favoritos from tbl_produto order by id desc` 
+    let sql = `select cast(id as float) as id, nome,foto, preco,descricao, status_promocao, status_favoritos from tbl_produto order by id desc` 
 
    
     const rsProdutos = await prisma.$queryRawUnsafe(sql)
@@ -16,13 +21,20 @@ const selectAllProdutos = async function() {
     }
 }
 
-const selectAllPizzas = async () => {
+const selectAllPizzas = async function() {
 
-    let sql = `select tbl_produto.nome, tbl_produto.preco, tbl_produto.status_promocao, tbl_produto.status_favoritos, tbl_produto.id from tbl_produto
-                inner join tbl_pizza on tbl_produto.id = tbl_pizza.id_produto`
+    const { PrismaClient } = require('@prisma/client')
 
+    const prisma = new PrismaClient()
+
+
+    const sql = `select tbl_produto.nome, tbl_produto.foto, tbl_produto.preco, tbl_produto.descricao, tbl_produto.status_promocao, tbl_produto.status_favoritos, tbl_produto.id from tbl_produto
+    inner join tbl_pizza 
+        on tbl_produto.id = tbl_pizza.id_produto`
+    
+    
     const rsPizza = await prisma.$queryRawUnsafe(sql)
-
+   
     if (rsPizza.length > 0) {
         return rsPizza
     } else{
@@ -33,8 +45,14 @@ const selectAllPizzas = async () => {
 
 const selectAllBebidas = async () => {
 
-    let sql = `select tbl_produto.nome, tbl_produto.preco, tbl_produto.status_promocao, tbl_produto.status_favoritos, tbl_produto.id from tbl_produto
-                inner join tbl_bebida on tbl_produto.id = tbl_bebida.id_produto`
+    const { PrismaClient } = require('@prisma/client')
+
+    const prisma = new PrismaClient()
+
+
+    let sql = `select tbl_produto.nome, tbl_produto.foto, tbl_produto.preco, tbl_produto.descricao, tbl_bebida.litragem,tbl_bebida.teor_alcoolico, tbl_produto.status_promocao, tbl_produto.status_favoritos, tbl_produto.id from tbl_produto
+    inner join tbl_bebida 
+        on tbl_produto.id = tbl_bebida.id_produto;`
 
     const rsBebida = await prisma.$queryRawUnsafe(sql)
 
@@ -45,33 +63,72 @@ const selectAllBebidas = async () => {
     }
 }
 
-const selectPizzaById = async (id) => {
+const selectAllPromocao = async () => {
 
-    let sql = `.................. where tbl_pizza.id = ${id}`
+    const { PrismaClient } = require('@prisma/client')
 
-    const rsPizza = await prisma.$queryRawUnsafe(sql)
+    const prisma = new PrismaClient()
 
-    if(rsPizza.length > 0){
-        return rsPizza
+
+    let sql = `select * from tbl_produto where status_promocao = 1`
+
+    const rspromo = await prisma.$queryRawUnsafe(sql)
+
+    if (rspromo.length > 0) {
+        return rspromo
     } else{
         return false
     }
 }
+
+const selectAllFavorito = async () => {
+
+    const { PrismaClient } = require('@prisma/client')
+
+    const prisma = new PrismaClient()
+
+
+    let sql = `select * from tbl_produto where status_favoritos = 1`
+
+    const rsfav = await prisma.$queryRawUnsafe(sql)
+
+    if (rsfav.length > 0) {
+        return rsfav
+    } else{
+        return false
+    }
+}
+
+
 
 const selectProdutoById = async (id) => {
 
+    const { PrismaClient } = require('@prisma/client')
+
+    const prisma = new PrismaClient()
+
+
     const sql = `select * from tbl_produto where id = ${id}`
 
-    const result = prisma.$executeRawUnsafe(sql)
+    const result = await prisma.$queryRawUnsafe(sql)
 
     if(result){
-        return true
+        return result
     } else{
         return false
     }
 }
 
+
+
+
+
 const selectLastIdProduto = async () => {
+
+    const { PrismaClient } = require('@prisma/client')
+
+    const prisma = new PrismaClient()
+
     let sql = `select id from tbl_produto order by id desc limit 1`
     const result = await prisma.$queryRawUnsafe(sql)
 
@@ -85,10 +142,10 @@ const selectLastIdProduto = async () => {
 const insertProduto = async (produto) => {
     try{
 
-    const sql = `insert into tbl_produto(nome, foto, preco, status_promocao, status_favoritos) values('${produto.nome}', '${produto.foto}', '${produto.preco}', '${produto.status_promocao}','${produto.status_favoritos}')`
-
+    const sql = `insert into tbl_produto(nome, foto, preco, descricao, status_promocao, status_favoritos) values('${produto.nome}', '${produto.foto}', '${produto.preco}', '${produto.descricao}','${produto.status_promocao}','${produto.status_favoritos}')`
+    
     const result = await prisma.$executeRawUnsafe(sql)
-
+    
     if (result) {
         return true
     }else{
@@ -102,11 +159,11 @@ const insertProduto = async (produto) => {
 
 const updateProduto = async (produto) => {
     try {
+        
+    const sql = `update tbl_produto set nome = '${produto.nome}', foto = '${produto.foto}', preco = '${produto.preco}', descricao = '${produto.descricao}', status_promocao = ${produto.status_promocao}, status_favoritos = ${produto.status_favoritos} where id = ${produto.id}`
        
-    const sql = `update tbl_produto set nome = '${produto.nome}', foto = '${produto.foto}', preco = '${produto.preco}', status_promocao = '${produto.status_promocao}', status_favoritos = '${produto.status_favoritos}' where id = ${produto.id_produto}`
-
     const result = await prisma.$executeRawUnsafe(sql)
-
+        
     if(result){
         return true
     }else{
@@ -121,9 +178,9 @@ const updateProduto = async (produto) => {
 const deleteProduto = async (id) => {
     try {    
     const sql = `delete from tbl_produto where id = ${id}`
-
+    
     const result = await prisma.$executeRawUnsafe(sql)
-
+        
     if (result){
         return true
     }else{
@@ -212,7 +269,6 @@ module.exports = {
     selectAllPizzas,
     selectAllBebidas,
     selectLastIdProduto,
-    selectPizzaById,
     selectAllProdutos,
     insertProduto,
     updateProduto,
@@ -221,5 +277,8 @@ module.exports = {
     updatePizza,
     insertBebida,
     updateBebida,
-    selectProdutoById
+    selectProdutoById,
+    selectAllPromocao,
+    selectAllFavorito
+   
 }
