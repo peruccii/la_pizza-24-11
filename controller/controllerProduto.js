@@ -18,15 +18,16 @@ const listarProdutos = async function(){
     let dadosProdutosJSON = {}
 
     const { selectAllProdutos } = require('../model/DAO/produto.js')
+  
 
     const dadosProdutos = await selectAllProdutos()
-
+    
     if (dadosProdutos) {
 
         /* dadosAlunos.forEach(element => {
             element.id = Number(element.id)
         }); */
-
+       
         dadosProdutosJSON.produtos = dadosProdutos
         return dadosProdutosJSON
         
@@ -43,11 +44,11 @@ const deletarProduto = async (id) => {
     }
     
     const verificar = await produto.selectProdutoById(id)
-   
+        console.log(verificar);
     if (verificar) {
         
         const deleteProduto = await produto.deleteProduto(id)
-
+           
         if (deleteProduto) {
             return {status: 200, message: MESSAGE_SUCCESS.DELETE_ITEM}
         } else{
@@ -61,7 +62,7 @@ const deletarProduto = async (id) => {
 
 const atualizarProduto = async function(attpro)  {
    
-     if(attpro.nome == '' || attpro.nome == undefined || attpro.foto == '' || attpro.foto == undefined || attpro.preco == '' || attpro.preco == undefined || attpro.descricao == '' || attpro.descricao == undefined ){
+     if(attpro.nome == '' || attpro.nome == undefined || attpro.foto == '' || attpro.foto == undefined || attpro.preco == '' || attpro.preco == undefined || attpro.descricao == '' || attpro.descricao == undefined){
         
         return {status:400, message: MESSAGE_ERROR.REQUIRED_FIELDS}
     }else{
@@ -93,6 +94,7 @@ const listarPizzas = async function(){
     const dadosProdutos = await produto.selectAllPizzas()
    
     if (dadosProdutos) {
+       
         dadosProdutosJSON.pizzas = dadosProdutos
         dadosProdutosJSON.status = 200
     } else{
@@ -104,20 +106,16 @@ const listarPizzas = async function(){
 
 }
 
-const atualizarPizza = async function(pizza){
-    if(pizza.id == '' || pizza.id == undefined){
+const atualizarBebida = async function(bebida){
+    if(bebida.litragem == undefined || bebida.teor_alcoolico == undefined){
         return {status: 400, message:MESSAGE_ERROR.REQUIRED_ID}
-    }else if(pizza.descricao =='' || pizza.descricao == undefined || pizza.id_produto =='' || pizza.id_produto == undefined){
-        return {status:400, message: MESSAGE_ERROR.REQUIRED_FIELDS}
     }else{
         const atualizar = require('../model/dao/produto.js')
-
-     
-
-            const verificar = await atualizar.selectProdutoById(pizza.id)
-
+         const verificar = await atualizar.selectBebidaById(bebida.id)
+            console.log(verificar);
             if(verificar){
-                const rsPizza = await atualizar.updatePizza(pizza)
+
+                const rsPizza = await atualizar.updateBebida(bebida)
     
                 if(rsPizza){
                     return {status: 200, message: MESSAGE_SUCCESS.UPDATE_ITEM}
@@ -217,6 +215,25 @@ const novoProduto = async function(produto){
     }
 }
 
+const novaBebida = async function(bebida){
+    
+    if(bebida.litragem == undefined || bebida.teor_alcoolico == undefined){ 
+        return {status:400, message: MESSAGE_ERROR.REQUIRED_FIELDS}
+        
+    }else{
+        const newProduto = require('../model/DAO/produto.js')
+         
+            const rsBebida = await newProduto.insertBebida(bebida)
+            console.log(rsBebida);
+         
+            if(rsBebida){
+                return {status: 200, message: MESSAGE_SUCCESS.INSERT_ITEM}
+            }else{
+                return {status:500, message:MESSAGE_ERROR.INTERNAL_SERVER_ERROR}
+            }
+    }
+}
+
 const buscarProduto = async function(id){
     let produtoJSON = {}
 
@@ -248,8 +265,9 @@ module.exports = {
    listarPromocao,
    novoProduto,
    deletarProduto,
-   atualizarPizza,
+   atualizarBebida,
    atualizarProduto,
-   listarFavorito
+   listarFavorito,
+   novaBebida
   
 }

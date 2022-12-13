@@ -5,7 +5,7 @@ const insertUser = async (user) => {
 
     try{
 
-    const sql = `insert into tbl_login(usuario,senha) values(md5('${user.usuario}'),'${user.senha}')`
+    const sql = `insert into tbl_login(usuario,senha) values('${user.usuario}',md5('${user.senha}'))`
 
     const result = await prisma.$executeRawUnsafe (sql);
 
@@ -22,7 +22,7 @@ const insertUser = async (user) => {
 
 const selectUser = async () => {
 
-    const sql = `select * from tbl_login order by id desc`
+    const sql = `select * from tbl_login  order by id desc`
 
     const dados = await prisma.$queryRawUnsafe(sql)
 
@@ -53,17 +53,12 @@ const deleteUser = async (id) => {
 const selectUserById = async function (id) {
 
 
-    let sql = `select  
-                 id,
-                 usuario,
-                 senha
-                 from tbl_login
-                 where id = ${id}`;
+   const sql = `select * from tbl_login where id = '${id}'`;
 
 //Criamos um objeto de tipo RecordSet (rsAlunos) para receber os dados de BD atraves do script SQL (select)
 const rsUser = await prisma.$queryRawUnsafe(sql)
 
-if (rsUser.length > 0)
+if (rsUser)
 return rsUser;
 else 
 return false;

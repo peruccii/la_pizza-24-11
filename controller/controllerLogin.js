@@ -1,27 +1,29 @@
 const {MESSAGE_ERROR, MESSAGE_SUCCESS} = require('../modulo/config.js')
 const nlogin = require('../model/DAO/login.js');
 const log = require('../model/DAO/login')
+
+
 const novoLogin = async (login) => {
     const nlogin = require('../model/DAO/login.js');
 
-    if (login.usuario == undefined || user.usuario == '' || login.senha == '' || user.senha == undefined ) {
+    if (login.usuario == undefined || login.usuario == '' || login.senha == '' || login.senha == undefined ) {
         return {status:400, message: MESSAGE_ERROR.REQUIRED_FIELDS};
+    }else{
+        const jwt = require ('../middleware/middlewareJWT.js')
+        const resultnlogin = await nlogin.insertUser(login);
+
+           
+            if (resultnlogin) {
+                let tokenUser = await jwt.createJWT(resultnlogin.id)
+                resultnlogin.token = tokenUser
+               
+                return {status: 201, message: tokenUser};
+            } else {
+                return {status: 500, message: MESSAGE_ERROR.INTERNAL_SERVER_ERROR};
+            }
+       
     }
 
-    const result = await nlogin.searchLogin(login.usuario)
-
-    if (!result) {
-        const resultnlogin = await nlogin.insertUser(user);
-
-        if (resultnlogin) {
-            return {status: 201, message: MESSAGE_SUCCESS.INSERT_ITEM};
-        } else {
-            return {status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB};
-        }
-    } else{
-        return {status: 400, message: MESSAGE_ERROR.EXISTING_USER}
-    }
-    
         
 }
 
@@ -100,6 +102,7 @@ const listarLogin = async function(){
     return loginJSON
     
     }
+
 
 module.exports = {
 excluirLogin,
